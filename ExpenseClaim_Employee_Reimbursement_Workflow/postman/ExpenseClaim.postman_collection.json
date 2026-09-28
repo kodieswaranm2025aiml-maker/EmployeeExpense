@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "ExpenseClaim Employee Reimbursement Workflow",
+    "_postman_id": "expenseclaim-sece-2026",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{"key":"baseUrl","value":"http://localhost:8081"}],
+  "item": [
+    {
+      "name":"Create Employee",
+      "request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],
+      "body":{"mode":"raw","raw":"{\"name\":\"Test Employee\",\"email\":\"test.employee@example.com\",\"role\":\"EMPLOYEE\"}"},
+      "url":{"raw":"{{baseUrl}}/api/employees","host":["{{baseUrl}}"],"path":["api","employees"]}}
+    },
+    {
+      "name":"Create Claim with Multiple Items",
+      "request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],
+      "body":{"mode":"raw","raw":"{\"employeeId\":1,\"managerId\":2,\"items\":[{\"category\":\"TRAVEL\",\"description\":\"Train and taxi\",\"amount\":3500},{\"category\":\"FOOD\",\"description\":\"Meals\",\"amount\":1200}]}"},
+      "url":{"raw":"{{baseUrl}}/api/claims","host":["{{baseUrl}}"],"path":["api","claims"]}}
+    },
+    {
+      "name":"Submit Claim",
+      "request":{"method":"POST","url":{"raw":"{{baseUrl}}/api/claims/1/submit","host":["{{baseUrl}}"],"path":["api","claims","1","submit"]}}
+    },
+    {
+      "name":"Approve Claim - No Violation",
+      "request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],
+      "body":{"mode":"raw","raw":"{\"managerId\":2,\"overridePolicyLimit\":false,\"remarks\":\"Approved after review\"}"},
+      "url":{"raw":"{{baseUrl}}/api/claims/1/approve","host":["{{baseUrl}}"],"path":["api","claims","1","approve"]}}
+    },
+    {
+      "name":"Approve Claim - With Manager Override",
+      "request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],
+      "body":{"mode":"raw","raw":"{\"managerId\":2,\"overridePolicyLimit\":true,\"remarks\":\"Policy exception approved by manager\"}"},
+      "url":{"raw":"{{baseUrl}}/api/claims/1/approve","host":["{{baseUrl}}"],"path":["api","claims","1","approve"]}}
+    },
+    {
+      "name":"Reject Claim",
+      "request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],
+      "body":{"mode":"raw","raw":"{\"managerId\":2,\"remarks\":\"Insufficient supporting reason\"}"},
+      "url":{"raw":"{{baseUrl}}/api/claims/1/reject","host":["{{baseUrl}}"],"path":["api","claims","1","reject"]}}
+    },
+    {
+      "name":"Mark Claim Paid",
+      "request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],
+      "body":{"mode":"raw","raw":"{\"financeId\":3,\"paymentReference\":\"BANK-UTR-1001\"}"},
+      "url":{"raw":"{{baseUrl}}/api/claims/1/pay","host":["{{baseUrl}}"],"path":["api","claims","1","pay"]}}
+    },
+    {
+      "name":"Pending Manager Claims",
+      "request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/claims/pending/manager","host":["{{baseUrl}}"],"path":["api","claims","pending","manager"]}}
+    },
+    {
+      "name":"Employee Claim History",
+      "request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/claims/employee/1","host":["{{baseUrl}}"],"path":["api","claims","employee","1"]}}
+    },
+    {
+      "name":"Paginated Claims",
+      "request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/claims/page?page=0&size=10","host":["{{baseUrl}}"],"path":["api","claims","page"],"query":[{"key":"page","value":"0"},{"key":"size","value":"10"}]}}
+    },
+    {
+      "name":"Summary",
+      "request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/claims/summary","host":["{{baseUrl}}"],"path":["api","claims","summary"]}}
+    },
+    {
+      "name":"Policy Limits",
+      "request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/policies","host":["{{baseUrl}}"],"path":["api","policies"]}}
+    }
+  ]
+}
