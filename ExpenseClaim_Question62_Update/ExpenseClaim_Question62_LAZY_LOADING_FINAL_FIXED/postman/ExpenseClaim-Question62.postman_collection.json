@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "ExpenseClaim - Question 62",
+    "_postman_id": "7f4f2d9c-9f45-4d8d-a1d0-62expenseclaim",
+    "description": "Normal and business-rule edge cases for the Employee Expense Reimbursement Approval Workflow.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key":"baseUrl","value":"http://localhost:8081"},
+    {"key":"employeeId","value":"1"},
+    {"key":"managerId","value":"3"},
+    {"key":"financeId","value":"4"},
+    {"key":"claimId","value":"1"}
+  ],
+  "item": [
+    {"name":"01 - Get employees","request":{"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/employees","host":["{{baseUrl}}"],"path":["api","employees"]}}},
+    {"name":"02 - Get policies","request":{"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/policies","host":["{{baseUrl}}"],"path":["api","policies"]}}},
+    {"name":"03 - Submit normal claim","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"employeeId\": {{employeeId}},\n  \"title\": \"Client visit expenses\",\n  \"description\": \"Travel and lunch for client meeting\",\n  \"items\": [\n    {\"category\":\"Travel\",\"description\":\"Train travel\",\"amount\":3500},\n    {\"category\":\"Food\",\"description\":\"Client lunch\",\"amount\":1200}\n  ]\n}"},"url":{"raw":"{{baseUrl}}/api/claims","host":["{{baseUrl}}"],"path":["api","claims"]}}},
+    {"name":"04 - Submit policy violation claim","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"employeeId\": {{employeeId}},\n  \"title\": \"Emergency travel\",\n  \"description\": \"Urgent client travel above policy limit\",\n  \"items\": [\n    {\"category\":\"Travel\",\"description\":\"Emergency travel\",\"amount\":7000}\n  ]\n}"},"url":{"raw":"{{baseUrl}}/api/claims","host":["{{baseUrl}}"],"path":["api","claims"]}}},
+    {"name":"05 - Pending manager claims","request":{"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/claims/stage/PENDING_MANAGER?page=0&size=10","host":["{{baseUrl}}"],"path":["api","claims","stage","PENDING_MANAGER"],"query":[{"key":"page","value":"0"},{"key":"size","value":"10"}]}}},
+    {"name":"06 - EDGE: approve violation without override (must fail 409)","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"managerId\": {{managerId}},\n  \"overridePolicy\": false,\n  \"remarks\": \"Trying normal approval without override\"\n}"},"url":{"raw":"{{baseUrl}}/api/claims/{{claimId}}/approve","host":["{{baseUrl}}"],"path":["api","claims","{{claimId}}","approve"]}}},
+    {"name":"07 - Approve claim with override","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"managerId\": {{managerId}},\n  \"overridePolicy\": true,\n  \"remarks\": \"Approved due to urgent client requirement\"\n}"},"url":{"raw":"{{baseUrl}}/api/claims/{{claimId}}/approve","host":["{{baseUrl}}"],"path":["api","claims","{{claimId}}","approve"]}}},
+    {"name":"08 - Reject claim","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"managerId\": {{managerId}},\n  \"overridePolicy\": false,\n  \"remarks\": \"Insufficient business justification\"\n}"},"url":{"raw":"{{baseUrl}}/api/claims/{{claimId}}/reject","host":["{{baseUrl}}"],"path":["api","claims","{{claimId}}","reject"]}}},
+    {"name":"09 - EDGE: finance pays unapproved claim (must fail 409)","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"financeId\": {{financeId}},\n  \"paymentReference\": \"PAY-BEFORE-APPROVAL\"\n}"},"url":{"raw":"{{baseUrl}}/api/claims/{{claimId}}/pay","host":["{{baseUrl}}"],"path":["api","claims","{{claimId}}","pay"]}}},
+    {"name":"10 - Pay approved claim","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"financeId\": {{financeId}},\n  \"paymentReference\": \"PAY-2026-001\"\n}"},"url":{"raw":"{{baseUrl}}/api/claims/{{claimId}}/pay","host":["{{baseUrl}}"],"path":["api","claims","{{claimId}}","pay"]}}},
+    {"name":"11 - Dashboard","request":{"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/claims/dashboard","host":["{{baseUrl}}"],"path":["api","claims","dashboard"]}}},
+    {"name":"12 - Audit log","request":{"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/audit?page=0&size=20","host":["{{baseUrl}}"],"path":["api","audit"],"query":[{"key":"page","value":"0"},{"key":"size","value":"20"}]}}}
+  ]
+}

@@ -1,0 +1,1 @@
+-- Seed data is inserted by DataSeeder.java so it works consistently with MySQL and H2.
